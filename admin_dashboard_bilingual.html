@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trip Booking Admin Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .form-group { margin-bottom: 10px; }
+    label { display: block; margin-bottom: 5px; }
+    select, input { padding: 5px; width: 100%; }
+    button { margin-top: 10px; padding: 10px 20px; }
+    textarea { width: 100%; height: 200px; margin-top: 20px; }
+    .lang-toggle { float: right; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="lang-toggle">
+    <button onclick="setLang('en')">🇬🇧 English</button>
+    <button onclick="setLang('es')">🇪🇸 Español</button>
+  </div>
+
+  <h2 id="title">Trip Booking Admin Dashboard</h2>
+
+  <div class="form-group">
+    <label id="tripLabel" for="tripSelect">Select Trip</label>
+    <select id="tripSelect"></select>
+  </div>
+
+  <div class="form-group">
+    <label id="startLabel" for="startDate">Start Date</label>
+    <input type="date" id="startDate">
+  </div>
+
+  <div class="form-group">
+    <label id="endLabel" for="endDate">End Date (optional)</label>
+    <input type="date" id="endDate">
+  </div>
+
+  <button onclick="addTrip()" id="addBtn">Add Trip</button>
+  <button onclick="clearTrips()" id="clearBtn">Clear All</button>
+  <button onclick="downloadCSV()" id="downloadBtn">Download CSV</button>
+
+  <textarea id="csvOutput" placeholder="CSV output will appear here..."></textarea>
+
+  <script>
+    const trips = {"en": ['Guadalest and Denia Excursion', 'San Jose Caves and Vilafamés', 'The Ebro Delta and Peñiscola', 'Rivers Romans and Reus', 'Morella Day Trip', 'Cañones del Júcar and Alcala del Júcar Day Trip', 'Tabarca Island with Snorkelling'], "es": ['Guadalest y Denia Excursión', 'Cuevas de San José y Vilafamés', 'El Delta del Ebro y Peñiscola', 'Rios Romanos y Reus', 'Morella Excursión', 'Cañones del Júcar y Alcala del Júcar', 'Isla de Tabarca con Snorkel']};
+    let currentLang = "en";
+
+    function populateTrips() {
+      const tripSelect = document.getElementById('tripSelect');
+      tripSelect.innerHTML = "";
+      trips[currentLang].forEach(trip => {
+        const option = document.createElement("option");
+        option.value = trip;
+        option.textContent = trip;
+        tripSelect.appendChild(option);
+      });
+    }
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.getElementById('title').textContent = lang === "en" ? "Trip Booking Admin Dashboard" : "Panel de Administración de Excursiones";
+      document.getElementById('tripLabel').textContent = lang === "en" ? "Select Trip" : "Selecciona la Excursión";
+      document.getElementById('startLabel').textContent = lang === "en" ? "Start Date" : "Fecha de Inicio";
+      document.getElementById('endLabel').textContent = lang === "en" ? "End Date (optional)" : "Fecha de Fin (opcional)";
+      document.getElementById('addBtn').textContent = lang === "en" ? "Add Trip" : "Añadir Excursión";
+      document.getElementById('clearBtn').textContent = lang === "en" ? "Clear All" : "Borrar Todo";
+      document.getElementById('downloadBtn').textContent = lang === "en" ? "Download CSV" : "Descargar CSV";
+      populateTrips();
+    }
+
+    function addTrip() {
+      const trip = document.getElementById('tripSelect').value;
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+      if (!trip || !start) return;
+      const row = [trip, start, end].filter(Boolean).join(",") + "\n";
+      document.getElementById('csvOutput').value += row;
+    }
+
+    function clearTrips() {
+      document.getElementById('csvOutput').value = "";
+    }
+
+    function downloadCSV() {
+      const csv = document.getElementById('csvOutput').value;
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = "bookings.csv";
+      link.click();
+    }
+
+    setLang('en');  // Default to English
+  </script>
+</body>
+</html>
